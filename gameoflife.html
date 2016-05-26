@@ -1,0 +1,77 @@
+<canvas id="c"></canvas>
+<script>
+    "use strict";
+
+    const ctx = c.getContext("2d");
+    c.height = window.innerHeight;
+    c.width = window.innerWidth;
+
+    document.body.style.margin = 0;
+
+    let map = {};
+    for(let x = 0; x < c.width / 10; ++x) {
+        map[x] = {};
+        for(let y = 0; y < c.height / 10; ++y) map[x][y] = Math.round(Math.random() * 1);
+    }
+
+    ctx.fillStyle = "darkred";
+    let add, remove, pause = false;
+    (function run() {
+        ctx.clearRect(0,0,c.width,c.height);
+
+        add = [], remove = [];
+        for(let x = 0; x < c.width / 10; ++x) {
+            for(let y = 0; y < c.height / 10; ++y) {
+                if(map[x][y]) ctx.fillRect(x * 10, y * 10,10,10);
+
+                if(pause) continue;
+
+                let neighbors = 0;
+                for (var r = 0; r < 2 * Math.PI; r += Math.PI / 4) {
+                    if (map[x + Math.round(Math.sin(r))] && map[x + Math.round(Math.sin(r))][y + Math.round(Math.cos(r))]) {
+                        ++neighbors;
+                    }
+                }
+                if (!map[x][y] && neighbors == 3) add.push({x, y});
+                if (map[x][y] && (neighbors < 2 || neighbors > 3)) remove.push({x, y});
+            }
+        }
+
+        for(let i = 0; i < add.length; ++i) map[add[i].x][add[i].y] = true;
+        for(let i = 0; i < remove.length; ++i) map[remove[i].x][remove[i].y] = false;
+
+        window.requestAnimationFrame(run);
+    })();
+
+    c.onmousedown = function(e) {
+        map[Math.round(e.x / 10)][Math.round(e.y / 10)] = !map[Math.round(e.x / 10)][Math.round(e.y / 10)];
+        if(map[Math.round(e.x / 10)][Math.round(e.y / 10)]) ctx.fillRect(Math.round(e.x / 10) * 10, Math.round(e.y / 10) * 10,10,10);
+        pause = true;
+    }
+    c.onmouseup = function() { pause = false }
+    c.onmousemove = function(e) {
+        if(e.which == 1) map[Math.round(e.x / 10)][Math.round(e.y / 10)] = true;
+        if(map[Math.round(e.x / 10)][Math.round(e.y / 10)]) ctx.fillRect(Math.round(e.x / 10) * 10, Math.round(e.y / 10) * 10,10,10);
+    }
+    document.onkeypress = function(e) {
+        if(e.which == 99) {
+            for(var x = 0; x < c.width / 10; ++x) {
+                map[x] = {};
+                for(var y = 0; y < c.height / 10; ++y) {
+                    map[x][y] = false;
+                }
+            }
+        }
+    }
+
+</script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-63707482-2', 'auto');
+    ga('send', 'pageview');
+
+</script>
